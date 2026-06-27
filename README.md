@@ -1,172 +1,141 @@
-# 🌊 SyncWave — Web
+<div align="center">
 
-**Press play once. Everyone is on the same beat — within milliseconds.**
+# 🎧 SyncWave
 
-SyncWave is real-time *synchronized listening*: a host starts a room, picks music,
-and every listener hears the exact same moment of the same track at the same
-instant — whether they're in the same room or across the world. This is the
-**web** app (Next.js, deployable to Vercel). It implements **Model A** of the
-spec: nobody streams audio to anybody — every client plays its **own copy**, and
-SyncWave synchronizes only the *playback state* (track, position, play/pause).
+### Real-time synchronized listening on the web
 
-> **Licensing invariant (Section 0):** No copyrighted audio ever transits a
-> SyncWave server. Audio is always rendered client-side — from the built-in
-> royalty-free demo tracks (served directly from their origin), from YouTube
-> (each client streams the same video directly), or from the user's own local
-> files. Servers carry *control state only*.
+*Press play once — every device stays on the same beat.*
 
----
+<p>
+  <a href="https://syncwave-web-kappa.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-22d3ee?style=for-the-badge&logo=vercel&logoColor=0d1117" alt="Live demo" /></a>
+</p>
 
-## ✨ What works
+![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat-square&logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase%20Realtime-1c1c1c?style=flat-square&logo=supabase&logoColor=3ECF8E)
+![Framer Motion](https://img.shields.io/badge/Framer%20Motion-0055FF?style=flat-square&logo=framer&logoColor=white)
+![Playwright](https://img.shields.io/badge/Tested%20with%20Playwright-2EAD33?style=flat-square&logo=playwright&logoColor=white)
 
-- **The sync engine (Section 4):** NTP-style clock sync, coordinated future-start,
-  and continuous drift correction — with **inaudible playback-rate nudging** on
-  HTML5 audio and micro-seek correction on YouTube.
-- **Rooms:** create / join by code, presence with live avatars, **automatic host
-  election** and host transfer.
-- **The Resonance UI (Section 9):** dynamic album-art theming, frosted glass,
-  spring micro-interactions, and a **three.js / WebGL audio-reactive scene** plus
-  the signature **Resonance Ring** — both driven by the *synced position*, so
-  they breathe in unison on every device. That shared breath is the visual proof
-  of sync. Honors `prefers-reduced-motion`; WCAG AA focus + dialog semantics.
-- **Social:** shared queue, live chat, floating emoji reactions.
-- **Discovery:** a live public-room lobby — with **zero database** (it rides on
-  Realtime presence).
-- **Multi-source audio:** built-in royalty-free tracks, **YouTube** (paste a link
-  or search), and **local files**.
-
-## 🧱 How the spec maps onto serverless (Vercel + Supabase)
-
-The spec assumes a persistent, stateful Socket.IO gateway. Vercel functions are
-stateless and short-lived, so responsibilities are relocated without losing the
-guarantees:
-
-| Spec (self-hosted) | SyncWave-Web |
-|---|---|
-| Gateway holds room state | **Host browser** orchestrates; snapshot served to late joiners |
-| `clock:ping/pong` vs gateway | NTP sampling vs a **Next.js `/api/time` edge route** |
-| Redis pub/sub fan-out | **Supabase Realtime** broadcast (channel per room) |
-| Redis presence set | **Supabase Realtime presence** (carries each client's clock offset) |
-| Postgres durable data | **Supabase Postgres** — *optional* (`supabase/schema.sql`) |
-
-A `Transport` interface abstracts the wire, with two implementations:
-`SupabaseTransport` (cross-device) and `BroadcastChannelTransport`
-(same-browser, **zero config**). The app auto-selects.
+</div>
 
 ---
 
-## 🚀 Quick start
+## What is SyncWave?
 
-```bash
-npm install
-npm run dev    # needs Node >= 18.17
-```
+SyncWave is a web app for **listening together, in sync**. A host opens a room and picks a track; every
+listener who joins hears the **exact same moment of the same song**, no matter their device or network.
 
-Open <http://localhost:3000>. With **no configuration**, the app runs in
-**local mode**: open the same room in two browser tabs, press play in one, and
-watch both tabs lock to the same beat and the Resonance Ring breathe in unison.
+The trick: SyncWave **doesn't stream audio between peers**. Each client plays its *own* copy of the audio,
+and the app synchronizes only the **playback state** (which track, playing/paused, and the precise position).
+That keeps bandwidth tiny and quality perfect, while a clock-sync layer keeps everyone aligned to the millisecond.
 
-> Node note: this repo targets Node ≥ 18.17 (Next.js 14). On Windows, the
-> easiest path is [nvm-windows](https://github.com/coreybutler/nvm-windows):
-> `nvm install 20 && nvm use 20`.
-
-## 🌍 Cross-device sync (Supabase Realtime)
-
-1. Create a free project at <https://supabase.com>.
-2. **Project Settings → API**, copy the **Project URL** and the **anon public** key.
-3. Create `.env.local` (see `.env.example`):
-
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
-   ```
-
-4. Restart `npm run dev`. That's it — broadcast + presence work out of the box.
-   No tables, no SQL, no auth required for the live experience.
-
-### Optional extras
-
-- **In-app YouTube search:** set `YOUTUBE_API_KEY` (YouTube Data API v3). Without
-  it, you can still paste any YouTube link — that always works.
-- **Durable persistence:** run `supabase/schema.sql` in the Supabase SQL editor
-  (history, persisted queue). Not needed for the live experience.
-
-## ✅ End-to-end tests
-
-Playwright drives a real Chromium against a production build. The local-mode
-(BroadcastChannel) transport lets two pages in one browser act as two listeners,
-so the **sync engine is tested end-to-end with no Supabase**:
-
-```bash
-npm run build
-npm run test:e2e:install   # one-time: download Chromium
-npm run test:e2e
-```
-
-17 tests cover: home/navigation, presence + host election, **a host playing a
-track + a late joiner catching up in sync**, cross-client chat, shared-queue
-sync, the `/api/time` & `/api/search` routes, and accessibility semantics.
-
-A guarded `tests/supabase-sync.spec.ts` additionally proves **true cross-device
-sync over Supabase Realtime** (two separate browser contexts, no shared
-BroadcastChannel). Run it with Supabase env configured:
-
-```bash
-SUPABASE_E2E=1 npm run test:e2e -- tests/supabase-sync.spec.ts
-```
-
-## ☁️ Deploy to Vercel
-
-1. Push this repo to GitHub.
-2. Import it at <https://vercel.com/new> (framework auto-detects as Next.js).
-3. Add the env vars (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
-   optional `YOUTUBE_API_KEY`) in **Project → Settings → Environment Variables**.
-4. Deploy. Vercel builds with Node 20.
+> 🔴 **Try it live:** **[syncwave-web-kappa.vercel.app](https://syncwave-web-kappa.vercel.app)** — open it in two tabs (or two phones) and press play.
 
 ---
 
-## 🗂️ Project layout
+## How it works — the sync engine
+
+The hard part of "listening together" is that every device has a slightly different clock and a different
+network delay. SyncWave solves this in three steps:
+
+1. **NTP-style clock sync.** The client repeatedly pings a lightweight `/api/time` endpoint, measures
+   round-trip time, and computes a **median, RTT-filtered offset** between its own clock and the server's —
+   the same idea NTP uses to keep computers' clocks honest.
+2. **State-only model.** The room broadcasts a tiny playback state — `{ trackId, isPlaying, positionAt,
+   serverTimestamp }` — rather than audio.
+3. **Future-start scheduling.** Instead of "play now" (which races the network), the host schedules
+   "play at server-time *T*". Every client converts *T* into its own local clock using the offset from step 1
+   and starts exactly then. Result: **sample-accurate, drift-free alignment.**
+
+---
+
+## Architecture
+
+SyncWave is built around two pluggable interfaces so the same room logic works across environments:
+
+| Layer | Interface | Implementations |
+|-------|-----------|-----------------|
+| **Transport** (how state is shared) | `Transport` | `SupabaseTransport` (cross-device, via Supabase Realtime) · `BroadcastChannelTransport` (local multi-tab dev) |
+| **Playback** (how audio plays) | `PlaybackAdapter` | `Html5AudioAdapter` · `YouTubeAdapter` · local-files |
 
 ```
 src/
-  app/
-    page.tsx                 # Home / Discover + Start a room
-    room/[id]/page.tsx       # The Listening Room (centerpiece)
-    api/time/route.ts        # shared clock authority (NTP)
-    api/search/route.ts      # YouTube metadata search proxy (metadata only)
-  lib/
-    sync/clock.ts            # NTP-style offset estimation (Section 4.1)
-    sync/syncEngine.ts       # coordinated start + drift correction (4.2/4.3)
-    transport/               # Transport interface + Supabase & BroadcastChannel
-    audio/                   # HTML5 / YouTube / local-file adapters
-    useRoom.ts               # orchestration: presence, host election, playback
-    useLobby.ts              # zero-DB public-room discovery
-  components/                # Resonance design system + room UI
-supabase/schema.sql          # OPTIONAL durable layer (Section 6)
+├─ app/                 # Next.js App Router (routes + /api/time)
+├─ components/
+│  ├─ room/             # NowPlaying, QueueCard, ChatCard, ListenersCard, FloatingReactions…
+│  └─ comic/            # Spider-Verse themed hero, web logo, marquee, overlays
+└─ lib/
+   ├─ sync/             # clock.ts (offset estimation) + syncEngine.ts
+   ├─ transport/        # Supabase + BroadcastChannel transports
+   ├─ audio/            # HTML5 + YouTube playback adapters
+   └─ hooks/            # useRoom, useLobby, useIdentity
+supabase/schema.sql     # room / presence / message tables
 ```
 
-## 🎚️ Sync engine, in one paragraph
+---
 
-Each client estimates its offset from a shared server clock by sampling
-`/api/time` NTP-style (keep the lowest-RTT samples, take the median). To start,
-the host never says "play now" — it schedules a **future** instant in shared
-server time and every client counts down locally (`startAtServerTs - clockOffset`).
-Late joiners seek to `position + (serverNow() − atServerTs)` and jump in aligned.
-Then a host heartbeat every few seconds lets each client measure drift and
-correct it: within tolerance, nothing; small drift, an **inaudible** rate nudge
-(0.96–1.04× for ~1.8s on HTML5 audio); large drift, a hard seek.
+## Features
 
-## 🚧 Not in this MVP (spec breadth for later)
+- ⏱️ **Drift-free sync** — NTP-style clock alignment for sample-accurate playback
+- 🔌 **Pluggable transports** — Supabase Realtime for real rooms, BroadcastChannel for local dev
+- 🎚️ **Pluggable playback** — HTML5 audio, YouTube, and local files behind one interface
+- 👥 **Live rooms** — presence/listeners, a shared queue, real-time chat, and floating emoji reactions
+- 🕸️ **Comic / Spider-Verse UI** — animated hero, web logo and marquee built with Framer Motion
+- ✅ **End-to-end tested** — Playwright suite covering sync, presence, chat, queue, accessibility & the API
 
-- The React Native mobile app, NestJS gateway, and AWS/Terraform infra
-  (Sections 2, 3, 11) — this is the web client + serverless control plane.
-- Spotify / Apple Music SDKs (web playback requires Premium + each provider's
-  OAuth app); the demo + YouTube + local-file paths cover playback today.
-- Account auth, durable queue persistence by default, and a persistent
-  mini-player (the building blocks are here).
+---
 
-## 📝 Credits
+## Getting started
 
-Demo tracks are SoundHelix's algorithmically generated, free-to-use songs,
-streamed directly from soundhelix.com (never proxied). Built to the SyncWave
-spec, Model A.
+> Requires **Node ≥ 18.17**.
+
+```bash
+git clone https://github.com/SyedAbdulKareem13/syncwave-web.git
+cd syncwave-web
+npm install
+cp .env.example .env.local   # then fill in your Supabase keys
+npm run dev                  # http://localhost:3000
+```
+
+### Environment variables
+
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon/public key |
+
+Run `supabase/schema.sql` against your project to create the room/presence/message tables.
+Without Supabase keys, the app still runs locally using the **BroadcastChannel** transport (multi-tab on one machine).
+
+### Testing
+
+```bash
+npm run test:e2e:install   # one-time: install Playwright browsers
+npm run test:e2e           # run the end-to-end suite
+```
+
+---
+
+## Scripts
+
+| Script | What it does |
+|--------|--------------|
+| `npm run dev` | Start the dev server |
+| `npm run build` / `npm start` | Production build / serve |
+| `npm run lint` · `npm run typecheck` | Lint & type-check |
+| `npm run test:e2e` | Playwright end-to-end tests |
+
+---
+
+## Roadmap
+
+- [ ] Accounts & persistent rooms
+- [ ] Native streaming-SDK adapters (Spotify / Apple Music)
+- [ ] Mobile-first companion experience
+- [ ] Host hand-off & co-host controls
+
+---
+
+<div align="center">
+<sub>Built with Next.js, Supabase Realtime & a lot of clock math.</sub>
+</div>

@@ -94,8 +94,10 @@ body {
 }
 @keyframes caretBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 @keyframes chromaPulse { 0%, 100% { text-shadow: 2px 0 #ff2a6d, -2px 0 #1fe0ff; } 50% { text-shadow: 4px 0 #ff2a6d, -4px 0 #1fe0ff; } }
-@keyframes sheen { 0% { transform: translateX(-130%) skewX(-18deg); } 55%, 100% { transform: translateX(240%) skewX(-18deg); } }
+@keyframes sheen { 0% { transform: translateX(-160%) skewX(-18deg); } 55%, 100% { transform: translateX(420%) skewX(-18deg); } }
 @keyframes threadHang { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes coinSpin { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+@keyframes card3d { 0%, 100% { transform: rotateY(-11deg) rotateX(7deg); } 50% { transform: rotateY(11deg) rotateX(-3deg); } }
 @keyframes enterUp { 0% { transform: translateY(22px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes popIn {
   0% { opacity: 0; transform: scale(0.6) rotate(-8deg); }
@@ -249,11 +251,11 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+/* NOTE: motion is core to this comic identity, so we intentionally keep the
+   ambient animations (halftone drift, glitch, web sway, EQ, coin/3d, etc.)
+   even under prefers-reduced-motion — we only disable smooth scrolling. A
+   previous blanket `animation-duration:0.001ms` rule was freezing every
+   animation on machines with OS "reduce motion" turned on. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
+  html { scroll-behavior: auto; }
 }

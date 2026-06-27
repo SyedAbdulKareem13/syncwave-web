@@ -5,7 +5,10 @@ import { ComicOverlays } from "@/components/comic/Overlays";
 import { WebLogo } from "@/components/comic/WebLogo";
 import { Marquee } from "@/components/comic/Marquee";
 import { SpiderWebHero } from "@/components/comic/SpiderWebHero";
+import { DeveloperCredits } from "@/components/comic/DeveloperCredits";
 import { RoomCard } from "@/components/RoomCard";
+
+const LINKEDIN = "https://www.linkedin.com/feed/update/urn:li:activity:7466712261319954432/";
 import { useIdentity } from "@/lib/useIdentity";
 import { useLobby } from "@/lib/useLobby";
 import { saveRoomMeta } from "@/lib/roomMeta";
@@ -60,6 +63,7 @@ export default function HomePage() {
           <div style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
             <a href="#how" className="navlink">HOW IT WORKS</a>
             <a href="#live" className="navlink">LIVE ROOMS</a>
+            <a href="#credits" className="navlink">CREDITS</a>
             {identity && (
               <button onClick={() => setEditingName(true)} className="cbtn-sm" style={{ ...sv(3, 5), display: "inline-flex", alignItems: "center", gap: 7, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: ".06em", color: "#08070F", background: "#FFE600", border: "2.5px solid #000", padding: "7px 10px" }} title="Set your name">
                 <span style={{ fontSize: 13 }}>🕷️</span>{identity.name}
@@ -75,7 +79,7 @@ export default function HomePage() {
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: ".14em", color: "#1FE0FF", border: "2px solid #1FE0FF", padding: "5px 10px", marginBottom: 22, transform: "rotate(-1deg)" }}>// REAL-TIME AUDIO SYNC ENGINE</div>
             <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 0.96, fontSize: "clamp(44px,6vw,82px)", letterSpacing: "-.5px", color: "#F4F1FF" }} className="chroma-lg">PRESS PLAY ONCE.</h1>
             <h1 style={{ margin: "6px 0 0", fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 0.96, fontSize: "clamp(44px,6vw,82px)", letterSpacing: "-.5px", color: "#F4F1FF" }}>
-              EVERYONE&apos;S ON<br />THE <span style={{ color: "#1FE0FF", WebkitTextStroke: "2px #000", textShadow: "4px 4px 0 #FF2A6D", display: "inline-block", animation: "glitchTxt 4.5s steps(2) infinite" }}>BEAT.</span>
+              EVERYONE&apos;S ON<br />THE <span data-testid="glitch-beat" style={{ color: "#1FE0FF", WebkitTextStroke: "2px #000", textShadow: "4px 4px 0 #FF2A6D", display: "inline-block", animation: "glitchTxt 4.5s steps(2) infinite" }}>BEAT.</span>
             </h1>
             <div style={{ margin: "26px 0 30px", maxWidth: 520, background: "#FFE600", color: "#08070F", border: "3px solid #000", boxShadow: "6px 6px 0 #000", padding: "14px 16px", transform: "rotate(-.6deg)" }}>
               <span style={{ fontFamily: "var(--font-sticker)", fontSize: 13, letterSpacing: ".06em", color: "#FF2A6D", display: "block", marginBottom: 2 }}>// NARRATOR</span>
@@ -191,6 +195,9 @@ export default function HomePage() {
             </span>
           </div>
         </section>
+
+        {/* DEVELOPER CREDITS (3D) */}
+        <DeveloperCredits name="Syed ⚡" role="Designer & Developer" linkedIn={LINKEDIN} />
 
         {/* FOOTER */}
         <footer style={{ borderTop: "2px solid #221836", marginTop: 46, padding: "28px 30px", display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 16 }}>

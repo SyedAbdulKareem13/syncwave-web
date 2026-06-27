@@ -2,6 +2,7 @@
 export function WebLogo({ size = 42 }: { size?: number }) {
   return (
     <div
+      data-testid="web-logo"
       style={{ position: "relative", width: size, height: size, flex: "0 0 auto", animation: "webSway 4s steps(8) infinite" }}
     >
       <svg viewBox="0 0 100 100" style={{ width: "100%", height: "100%", display: "block", filter: "drop-shadow(0 0 6px rgba(31,224,255,.5))" }}>

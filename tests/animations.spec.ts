@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 
-const LINKEDIN = "https://www.linkedin.com/feed/update/urn:li:activity:7466712261319954432/";
+const LINKEDIN = "https://www.linkedin.com/in/syed-abdul-kareem-b33519200/";
 
 function toMs(d: string): number {
   d = d.trim();

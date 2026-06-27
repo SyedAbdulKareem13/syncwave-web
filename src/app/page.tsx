@@ -8,7 +8,7 @@ import { SpiderWebHero } from "@/components/comic/SpiderWebHero";
 import { DeveloperCredits } from "@/components/comic/DeveloperCredits";
 import { RoomCard } from "@/components/RoomCard";
 
-const LINKEDIN = "https://www.linkedin.com/feed/update/urn:li:activity:7466712261319954432/";
+const LINKEDIN = "https://www.linkedin.com/in/syed-abdul-kareem-b33519200/";
 import { useIdentity } from "@/lib/useIdentity";
 import { useLobby } from "@/lib/useLobby";
 import { saveRoomMeta } from "@/lib/roomMeta";

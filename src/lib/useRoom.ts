@@ -4,6 +4,7 @@ import { ClockSync } from "./sync/clock";
 import { SyncEngine } from "./sync/syncEngine";
 import { createTransport, type PresenceMeta, type Transport } from "./transport";
 import { UnresolvedTrackError, unlockAudio } from "./audio";
+import { registerLocalFileAs } from "./audio/localFiles";
 import { DEMO_TRACKS } from "./tracks";
 import { loadRoomMeta } from "./roomMeta";
 import type { ChatMessage, LobbyRoom, Member, PlaybackState, QueueItem, ReactionEvent, Role, SyncQuality, Track } from "./types";
@@ -46,6 +47,7 @@ export interface RoomApi {
   addToQueue: (track: Track) => void;
   removeFromQueue: (id: string) => void;
   reorderQueue: (orderedIds: string[]) => void;
+  resolveLocalFile: (file: File) => void;
   sendReaction: (emoji: string) => void;
   sendChat: (text: string) => void;
   transferHost: (userId: string) => void;
@@ -650,6 +652,21 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
     }
   }, []);
 
+  const resolveLocalFile = useCallback(
+    async (file: File) => {
+      const fileName = stateRef.current?.track?.fileName;
+      if (!fileName) return;
+      registerLocalFileAs(fileName, file); // map their copy to the host's track name
+      setUnresolved(false);
+      await unlockAudio();
+      audioReadyRef.current = true;
+      setAudioReady(true);
+      const s = stateRef.current;
+      if (s) await safeEngine((e) => e.applyHeartbeat(s)); // now resolves → plays in sync
+    },
+    [safeEngine],
+  );
+
   const sendReaction = useCallback(
     (emoji: string) => {
       const r: ReactionEvent = { id: uid(), userId: meId, emoji, ts: Date.now() };
@@ -722,6 +739,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
     addToQueue,
     removeFromQueue,
     reorderQueue,
+    resolveLocalFile,
     sendReaction,
     sendChat,
     transferHost,

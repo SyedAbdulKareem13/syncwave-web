@@ -18,6 +18,15 @@ export function registerLocalFile(file: File): Track {
   };
 }
 
+/**
+ * Map a picked file to a SPECIFIC expected fileName (the host's track name), so
+ * a listener can resolve the current local track by selecting their own copy —
+ * even if their filename differs.
+ */
+export function registerLocalFileAs(fileName: string, file: File): void {
+  registry.set(fileName, URL.createObjectURL(file));
+}
+
 export function getLocalUrl(fileName: string): string | undefined {
   return registry.get(fileName);
 }

@@ -140,8 +140,27 @@ export default function RoomPage({ params }: { params: { id: string } }) {
         </div>
 
         {room.unresolved && (
-          <div className="mt-3 rounded-full bg-sync-warn/15 px-4 py-1.5 text-xs text-sync-warn">
-            Can&apos;t play this track on your device — you&apos;re still in the room.
+          <div className="mt-3 max-w-sm text-center text-xs">
+            {room.track?.source === "local" ? (
+              <label className="inline-flex cursor-pointer flex-col items-center gap-1 rounded-2xl bg-sync-warn/15 px-4 py-2.5 text-sync-warn hover:bg-sync-warn/25">
+                <span className="font-medium">“{room.track.fileName}” is a local file on the host&apos;s device.</span>
+                <span className="underline">Pick your copy of it to listen in sync →</span>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  className="hidden"
+                  data-testid="resolve-local"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) room.resolveLocalFile(f);
+                  }}
+                />
+              </label>
+            ) : (
+              <span className="inline-block rounded-full bg-sync-warn/15 px-4 py-1.5 text-sync-warn">
+                Can&apos;t play this track on your device — you&apos;re still in the room.
+              </span>
+            )}
           </div>
         )}
 

@@ -54,7 +54,7 @@ export function NowPlaying({ room, onAddClick }: { room: RoomApi; onAddClick: ()
 
         {/* TITLE */}
         <div style={{ flex: 1, minWidth: 200 }}>
-          <h2 data-testid="track-title" style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "clamp(24px,3.2vw,38px)", lineHeight: 1, color: "#fff", textShadow: "2.5px 0 #FF2A6D,-2.5px 0 #1FE0FF" }}>
+          <h2 data-testid="track-title" style={{ margin: 0, fontFamily: "var(--font-display)", fontSize: "clamp(22px,6vw,38px)", lineHeight: 1.02, color: "#fff", textShadow: "2.5px 0 #FF2A6D,-2.5px 0 #1FE0FF", overflowWrap: "anywhere", wordBreak: "break-word" }}>
             {t ? t.title : isHost ? "DROP A TRACK" : "NOTHING PLAYING"}
           </h2>
           <div style={{ fontFamily: "var(--font-mono)", fontSize: 14, color: "#9A93B5", marginTop: 10 }}>

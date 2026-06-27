@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dynamic accent (r g b), morphed from album art at runtime. */
+  --accent: 124 92 255;
+  --accent-2: 40 200 220;
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #0b0b12;
+  color: #f5f5fa;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+/* The living "Resonance" background (Section 9.1): a slow gradient sampled from
+   the current accent pair, cross-fading on track change. */
+.resonance-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 80% at 15% 10%, rgb(var(--accent) / 0.28), transparent 60%),
+    radial-gradient(120% 90% at 85% 90%, rgb(var(--accent-2) / 0.24), transparent 60%),
+    linear-gradient(180deg, #0b0b12 0%, #0a0a10 100%);
+  transition: background 800ms ease;
+}
+.resonance-bg::after {
+  /* subtle film grain so flat areas don't band */
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Frosted glass surface (Section 9.1): backdrop blur ~28, ~10% white fill,
+   1px top hairline highlight. */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* Range input styled as the shared timeline */
+input[type="range"].timeline {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+input[type="range"].timeline::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #f5f5fa;
+  box-shadow: 0 0 0 4px rgb(var(--accent) / 0.4);
+  cursor: pointer;
+}
+input[type="range"].timeline::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: #f5f5fa;
+  box-shadow: 0 0 0 4px rgb(var(--accent) / 0.4);
+  cursor: pointer;
+}
+input[type="range"].timeline:disabled::-webkit-slider-thumb {
+  background: #9a9aae;
+  box-shadow: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

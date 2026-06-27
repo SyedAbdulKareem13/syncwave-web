@@ -97,7 +97,9 @@ export default function HomePage() {
           </div>
           <div style={{ flex: "1 1 380px", minWidth: 0, display: "flex", justifyContent: "center", animation: "enterUp .7s cubic-bezier(.16,1,.3,1) .12s both" }}>
             <div className="herostage">
-              <SpiderWebHero />
+              <div className="herostage-inner">
+                <SpiderWebHero />
+              </div>
             </div>
           </div>
         </section>

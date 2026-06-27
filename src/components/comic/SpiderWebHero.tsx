@@ -13,7 +13,7 @@ const NODES = [
 
 export function SpiderWebHero({ bpm = 124 }: { bpm?: number }) {
   return (
-    <div style={{ position: "relative", width: 440, height: 440, maxWidth: "90vw" }}>
+    <div style={{ position: "relative", width: 440, height: 440 }}>
       {/* spider on a thread */}
       <div style={{ position: "absolute", left: "50%", top: -6, width: 2, height: 64, background: "linear-gradient(#1FE0FF,transparent)", transformOrigin: "top" }}>
         <svg viewBox="0 0 40 40" width="34" height="34" style={{ position: "absolute", left: -16, top: 56, animation: "threadHang 4s steps(8) infinite", transformOrigin: "top center", filter: "drop-shadow(0 4px 4px rgba(0,0,0,.6))" }}>

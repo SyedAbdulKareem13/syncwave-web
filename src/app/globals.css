@@ -219,11 +219,22 @@ body {
   .room-grid { grid-template-columns: 1fr !important; padding: 16px !important; gap: 16px !important; }
   .vinyl { display: none !important; }
 }
-@media (max-width: 600px) {
-  .herostage { transform: scale(0.66); margin: -75px; }
+/* Hero web: fixed 440px box (so its absolutely-positioned nodes stay aligned),
+   scaled as a whole via a wrapper sized to the scaled footprint — no squashing,
+   no negative-margin hacks. */
+.herostage { display: flex; justify-content: center; }
+.herostage-inner { width: 440px; height: 440px; transform-origin: top center; }
+@media (max-width: 768px) {
+  .herostage { width: 308px; height: 308px; }
+  .herostage-inner { transform: scale(0.7); }
 }
-@media (max-width: 380px) {
-  .herostage { transform: scale(0.56); margin: -97px; }
+@media (max-width: 430px) {
+  .herostage { width: 255px; height: 255px; }
+  .herostage-inner { transform: scale(0.58); }
+}
+@media (max-width: 340px) {
+  .herostage { width: 220px; height: 220px; }
+  .herostage-inner { transform: scale(0.5); }
 }
 
 /* ── chromatic-aberration headings ────────────────────────────────────────── */

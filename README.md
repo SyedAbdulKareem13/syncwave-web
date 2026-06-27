@@ -107,6 +107,14 @@ npm run test:e2e
 track + a late joiner catching up in sync**, cross-client chat, shared-queue
 sync, the `/api/time` & `/api/search` routes, and accessibility semantics.
 
+A guarded `tests/supabase-sync.spec.ts` additionally proves **true cross-device
+sync over Supabase Realtime** (two separate browser contexts, no shared
+BroadcastChannel). Run it with Supabase env configured:
+
+```bash
+SUPABASE_E2E=1 npm run test:e2e -- tests/supabase-sync.spec.ts
+```
+
 ## ☁️ Deploy to Vercel
 
 1. Push this repo to GitHub.

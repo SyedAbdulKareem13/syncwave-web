@@ -18,6 +18,8 @@ export interface PlaybackAdapter {
   getPositionMs(): number;
   getDurationMs(): number;
   setRate(rate: number): void;
+  /** Local playback volume, 0..1 (personal — never synced). */
+  setVolume(volume: number): void;
   isReady(): boolean;
   isPlaying(): boolean;
   onEnded(cb: () => void): void;

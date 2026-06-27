@@ -1,230 +1,70 @@
 "use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
-import { ResonanceRing } from "@/components/ResonanceRing";
-import { AlbumArt } from "@/components/AlbumArt";
-import { SyncHealthChip } from "@/components/SyncHealthChip";
-import { Timeline } from "@/components/Timeline";
-import { HostControls } from "@/components/HostControls";
-import { PresenceBar } from "@/components/PresenceBar";
-import { ReactionLayer } from "@/components/ReactionLayer";
-import { BottomSheet } from "@/components/BottomSheet";
-import { QueuePanel } from "@/components/QueuePanel";
-import { ChatPanel } from "@/components/ChatPanel";
-import { ReactPanel } from "@/components/ReactPanel";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ComicOverlays } from "@/components/comic/Overlays";
+import { RoomTopBar } from "@/components/room/RoomTopBar";
+import { NowPlaying } from "@/components/room/NowPlaying";
+import { QueueCard } from "@/components/room/QueueCard";
+import { ListenersCard } from "@/components/room/ListenersCard";
+import { ReactionsCard } from "@/components/room/ReactionsCard";
+import { ChatCard } from "@/components/room/ChatCard";
+import { FloatingReactions } from "@/components/room/FloatingReactions";
 import { TrackPicker } from "@/components/TrackPicker";
 import { JoinOverlay } from "@/components/JoinOverlay";
 import { useIdentity } from "@/lib/useIdentity";
 import { useRoom } from "@/lib/useRoom";
-import { resolveAccents, type AccentPair } from "@/lib/colors";
-import { applyAccents } from "@/lib/accents";
-import dynamic from "next/dynamic";
-
-const ResonanceScene = dynamic(() => import("@/components/ResonanceScene").then((m) => m.ResonanceScene), {
-  ssr: false,
-});
 
 export default function RoomPage({ params }: { params: { id: string } }) {
   const roomId = decodeURIComponent(params.id).toUpperCase();
+  const router = useRouter();
   const { identity } = useIdentity();
   const room = useRoom(roomId, identity);
-
-  const [accents, setAccents] = useState<AccentPair>({ accent: [124, 92, 255], accent2: [40, 200, 220] });
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [ringSize, setRingSize] = useState(320);
-  const [copied, setCopied] = useState(false);
-
-  // Theme morph on track change (Section 9.1).
-  useEffect(() => {
-    let alive = true;
-    void resolveAccents(room.track).then((p) => {
-      if (!alive) return;
-      setAccents(p);
-      applyAccents(p);
-    });
-    return () => {
-      alive = false;
-    };
-  }, [room.track?.uri]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const calc = () => setRingSize(Math.min(360, Math.max(232, window.innerWidth - 72)));
-    calc();
-    window.addEventListener("resize", calc);
-    return () => window.removeEventListener("resize", calc);
-  }, []);
-
-  const share = async () => {
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/room/${roomId}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1600);
-    } catch {
-      /* ignore */
-    }
-  };
 
   if (!identity) {
-    return <main className="grid min-h-dvh place-items-center text-text-muted">Loading…</main>;
+    return <main style={{ display: "grid", placeItems: "center", minHeight: "100dvh", color: "#9A93B5", fontFamily: "var(--font-mono)" }}>Loading…</main>;
   }
 
-  const hostMember = room.members.find((m) => m.userId === room.hostId);
-  const showStartCta = !room.track && room.isHost;
-  const showWaiting = !room.track && !room.isHost;
-
   return (
-    <motion.main
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      className="relative mx-auto min-h-dvh w-full max-w-2xl px-5 pb-28 pt-5"
-    >
-      {/* Top bar */}
-      <header className="flex items-center justify-between gap-3">
-        <Link href="/" className="glass grid h-9 w-9 place-items-center rounded-full text-text-muted hover:text-text-primary" aria-label="Back home">
-          ‹
-        </Link>
-        <div className="min-w-0 flex-1 text-center">
-          <h1 className="truncate font-display text-base font-semibold">{room.roomName}</h1>
-          <button onClick={share} data-testid="room-code" className="text-xs tracking-widest text-text-muted hover:text-text-primary">
-            {copied ? "Link copied ✓" : `CODE ${roomId} · share`}
-          </button>
-        </div>
-        <SyncHealthChip skewMs={room.skewMs} quality={room.syncQuality} isHost={room.isHost} mode={room.mode} />
-      </header>
+    <div style={{ position: "relative", minHeight: "100vh", display: "flex", flexDirection: "column", color: "#F4F1FF", fontFamily: "var(--font-sans)" }}>
+      <ComicOverlays />
 
-      {/* Presence */}
-      <div className="mt-4 flex justify-center">
-        <PresenceBar
-          members={room.members}
-          hostId={room.hostId}
-          meId={identity.userId}
-          isHost={room.isHost}
-          onTransfer={room.transferHost}
-        />
+      <div style={{ position: "relative", zIndex: 5, display: "flex", flexDirection: "column", flex: 1, animation: "enterUp .45s cubic-bezier(.16,1,.3,1) both" }}>
+        <RoomTopBar room={room} roomId={roomId} onLeave={() => router.push("/")} />
+
+        <div className="room-grid">
+          <NowPlaying room={room} onAddClick={() => setPickerOpen(true)} />
+
+          <div className="room-right">
+            <QueueCard
+              queue={room.queue}
+              isHost={room.isHost}
+              onPlay={(t) => room.playTrack(t)}
+              onRemove={room.removeFromQueue}
+              onAddClick={() => setPickerOpen(true)}
+            />
+            <ListenersCard members={room.members} hostId={room.hostId} meId={identity.userId} />
+            <ReactionsCard onReact={room.sendReaction} />
+            <ChatCard chat={room.chat} meId={identity.userId} onSend={room.sendChat} />
+          </div>
+        </div>
       </div>
 
-      {/* Player */}
-      <section className="relative mt-6 flex flex-col items-center">
-        <ReactionLayer reactions={room.reactions} />
+      <FloatingReactions reactions={room.reactions} />
 
-        {/* WebGL audio-reactive backdrop, behind the ring, driven by the synced position */}
-        <div
-          className="pointer-events-none absolute left-1/2 top-[110px] h-[460px] w-[460px] max-w-[94vw] -translate-x-1/2"
-          style={{ zIndex: -1 }}
-        >
-          <ResonanceScene positionMs={room.positionMs} isPlaying={room.isPlaying} accent={accents.accent} accent2={accents.accent2} className="h-full w-full" />
-        </div>
-
-        <div className="relative z-10">
-          <ResonanceRing positionMs={room.positionMs} isPlaying={room.isPlaying} accent={accents.accent} accent2={accents.accent2} size={ringSize}>
-            <AlbumArt track={room.track} accent={accents.accent} accent2={accents.accent2} />
-          </ResonanceRing>
-        </div>
-
-        <div className="mt-7 text-center">
-          <AnimatePresence mode="wait">
-            <motion.h2
-              key={room.track?.uri ?? "none"}
-              data-testid="track-title"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              className="font-display text-2xl font-semibold tracking-tight sm:text-3xl"
-            >
-              {room.track?.title ?? (showWaiting ? "Waiting for the host…" : "Nothing playing")}
-            </motion.h2>
-          </AnimatePresence>
-          {room.track?.artist && <p className="mt-1 text-text-muted">{room.track.artist}</p>}
-        </div>
-
-        {room.unresolved && (
-          <div className="mt-3 max-w-sm text-center text-xs">
-            {room.track?.source === "local" ? (
-              <label className="inline-flex cursor-pointer flex-col items-center gap-1 rounded-2xl bg-sync-warn/15 px-4 py-2.5 text-sync-warn hover:bg-sync-warn/25">
-                <span className="font-medium">“{room.track.fileName}” is a local file on the host&apos;s device.</span>
-                <span className="underline">Pick your copy of it to listen in sync →</span>
-                <input
-                  type="file"
-                  accept="audio/*"
-                  className="hidden"
-                  data-testid="resolve-local"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) room.resolveLocalFile(f);
-                  }}
-                />
-              </label>
-            ) : (
-              <span className="inline-block rounded-full bg-sync-warn/15 px-4 py-1.5 text-sync-warn">
-                Can&apos;t play this track on your device — you&apos;re still in the room.
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* Timeline + controls */}
-        <div className="mt-6 w-full max-w-md">
-          <Timeline positionMs={room.positionMs} durationMs={room.durationMs} canScrub={room.isHost && !!room.track} onSeek={room.seek} />
-          <div className="mt-5">
-            <HostControls
-              isHost={room.isHost}
-              isPlaying={room.isPlaying}
-              hasTrack={!!room.track}
-              hostName={hostMember?.name ?? ""}
-              onToggle={room.togglePlay}
-              onNext={room.next}
-              onPrev={room.prev}
-            />
-          </div>
-        </div>
-
-        {showStartCta && (
-          <button
-            onClick={() => setPickerOpen(true)}
-            data-testid="start-music"
-            className="mt-6 rounded-full px-6 py-3 font-semibold text-ink"
-            style={{ background: "rgb(var(--accent))", boxShadow: "0 8px 30px rgb(var(--accent) / 0.45)" }}
-          >
-            Start the music
-          </button>
-        )}
-      </section>
-
-      {/* Bottom sheet */}
-      <BottomSheet
-        queueCount={room.queue.length}
-        chatCount={room.chat.length}
-        queue={
-          <QueuePanel
-            queue={room.queue}
-            isHost={room.isHost}
-            onRemove={room.removeFromQueue}
-            onReorder={room.reorderQueue}
-            onAddClick={() => setPickerOpen(true)}
-          />
-        }
-        chat={<ChatPanel chat={room.chat} meId={identity.userId} onSend={room.sendChat} />}
-        react={<ReactPanel onReact={room.sendReaction} />}
-      />
-
-      {/* Modals */}
-      <AnimatePresence>
-        {pickerOpen && (
-          <TrackPicker
-            canPlayNow={room.isHost}
-            onClose={() => setPickerOpen(false)}
-            onSelect={(track, mode) => {
-              if (mode === "play") void room.playTrack(track);
-              else room.addToQueue(track);
-              setPickerOpen(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {pickerOpen && (
+        <TrackPicker
+          canPlayNow={room.isHost}
+          onClose={() => setPickerOpen(false)}
+          onSelect={(track, mode) => {
+            if (mode === "play") void room.playTrack(track);
+            else room.addToQueue(track);
+            setPickerOpen(false);
+          }}
+        />
+      )}
 
       {room.ready && !room.audioReady && <JoinOverlay roomName={room.roomName} onJoin={room.unlock} />}
-    </motion.main>
+    </div>
   );
 }

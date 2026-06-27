@@ -1,35 +1,30 @@
 import { test, expect } from "@playwright/test";
-import { roomUrl, tapToListen, openSheetTab } from "./helpers";
+import { roomUrl, tapToListen } from "./helpers";
 
 test("adding a track to the queue syncs to the other listener", async ({ browser }) => {
   const context = await browser.newContext();
 
-  // Host joins first and becomes the host.
   const host = await context.newPage();
   await host.goto(roomUrl("QUEUE1", "host-q", "Hostie"));
   await tapToListen(host);
 
-  // Listener joins the same room (same browser context -> BroadcastChannel realtime).
   const listener = await context.newPage();
   await listener.goto(roomUrl("QUEUE1", "list-q", "Listy"));
   await tapToListen(listener);
 
-  // Both pages should see two members.
   await expect(host.getByTestId("member")).toHaveCount(2, { timeout: 15000 });
   await expect(listener.getByTestId("member")).toHaveCount(2, { timeout: 15000 });
 
-  // Host opens the Queue tab and adds the first featured demo track.
-  await openSheetTab(host, "Queue");
-  await host.getByRole("button", { name: "+ Add music" }).click();
+  // Host opens the picker and queues the first featured track ("Resonance").
+  await host.getByRole("button", { name: "ADD MUSIC" }).first().click();
   await host.getByTestId("picker-queue").first().click();
 
-  // The picker modal should close and the host's queue should show one item.
+  // Picker closes after selecting.
   await expect(host.getByTestId("picker-queue")).toHaveCount(0, { timeout: 15000 });
-  await expect(host.getByText("1 up next")).toBeVisible({ timeout: 15000 });
 
-  // The listener should receive the queued item via realtime sync.
-  await openSheetTab(listener, "Queue");
-  await expect(listener.getByText("1 up next")).toBeVisible({ timeout: 15000 });
+  // The queued track appears in BOTH clients' queue panels (realtime sync).
+  await expect(host.getByText("Resonance")).toBeVisible({ timeout: 15000 });
+  await expect(listener.getByText("Resonance")).toBeVisible({ timeout: 15000 });
 
   await context.close();
 });

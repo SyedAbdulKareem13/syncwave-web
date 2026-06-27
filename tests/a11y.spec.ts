@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { roomUrl, tapToListen, openSheetTab } from "./helpers";
+import { roomUrl, tapToListen } from "./helpers";
 
 test.describe("SyncWave accessibility semantics", () => {
   test("the audio-unlock overlay is an accessible dialog", async ({ page }) => {
@@ -39,7 +39,6 @@ test.describe("SyncWave accessibility semantics", () => {
   test("emoji reactions have accessible labels", async ({ page }) => {
     await page.goto(roomUrl("A11YRM", "a11y-1", "Axe"));
     await tapToListen(page);
-    await openSheetTab(page, "React");
 
     const reacts = page.getByRole("button", { name: /^React with / });
     await expect(reacts.first()).toBeVisible({ timeout: 15000 });

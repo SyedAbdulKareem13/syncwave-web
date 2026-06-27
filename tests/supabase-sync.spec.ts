@@ -18,11 +18,11 @@ test("two separate browser contexts sync via Supabase Realtime", async ({ browse
   await tapToListen(host);
 
   // Confirm we're genuinely in cross-device (Supabase) mode, not local mode.
-  await expect(host.getByTestId("sync-chip")).toContainText("live", { timeout: 20_000 });
+  await expect(host.getByTestId("sync-chip")).toContainText(/live/i, { timeout: 20_000 });
 
   await host.getByTestId("start-music").click();
   await host.getByTestId("picker-play").first().click();
-  await expect.poll(() => trackTitle(host), { timeout: 25_000 }).not.toMatch(/Nothing playing|Waiting/i);
+  await expect.poll(() => trackTitle(host), { timeout: 25_000 }).not.toMatch(/Nothing playing|Waiting|DROP A TRACK/i);
   const title = await trackTitle(host);
 
   // Listener in a SEPARATE context joins — must catch up purely via Supabase.

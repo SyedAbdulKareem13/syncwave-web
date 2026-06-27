@@ -21,7 +21,7 @@ test("host plays a track; a late joiner catches up to the same track in sync", a
   // The track title becomes a real title (not the idle placeholder).
   await expect
     .poll(async () => trackTitle(host), { timeout: 20_000 })
-    .not.toMatch(/Nothing playing|Waiting/i);
+    .not.toMatch(/Nothing playing|Waiting|DROP A TRACK/i);
   const title = await trackTitle(host);
   expect(title.length).toBeGreaterThan(0);
 

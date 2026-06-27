@@ -32,6 +32,7 @@ export class SyncEngine {
   private startTimer: Timer | null = null;
   private nudgeTimer: Timer | null = null;
   private ticker: Timer | null = null;
+  private volume = 1;
 
   private readonly opts: Required<Omit<SyncEngineOptions, "onPosition" | "onSkew" | "onEnded">> &
     Pick<SyncEngineOptions, "onPosition" | "onSkew" | "onEnded">;
@@ -75,7 +76,14 @@ export class SyncEngine {
     if (this.active && this.active !== a) this.active.pause();
     this.active = a;
     this.track = track;
+    a.setVolume(this.volume);
     return a;
+  }
+
+  /** Local, personal volume (0..1) — applied to every adapter, never synced. */
+  setVolume(v: number): void {
+    this.volume = clamp(v, 0, 1);
+    for (const a of this.adapters.values()) a.setVolume(this.volume);
   }
 
   /** Load + buffer, seek to p0, leave paused. Resolves when playable. */

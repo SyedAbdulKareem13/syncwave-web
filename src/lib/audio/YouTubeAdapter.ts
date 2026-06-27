@@ -27,6 +27,7 @@ interface YTPlayer {
   mute(): void;
   unMute(): void;
   setPlaybackRate(rate: number): void;
+  setVolume(volume: number): void;
   getPlayerState(): number;
   destroy(): void;
 }
@@ -60,6 +61,7 @@ export class YouTubeAdapter implements PlaybackAdapter {
   private endedCb: (() => void) | null = null;
   private currentId: string | null = null;
   private cueResolve: (() => void) | null = null;
+  private volume = 1;
 
   private ensureContainer(): HTMLDivElement {
     if (this.container) return this.container;
@@ -137,6 +139,7 @@ export class YouTubeAdapter implements PlaybackAdapter {
 
   async play(): Promise<void> {
     this.player?.unMute();
+    this.player?.setVolume(this.volume * 100);
     this.player?.playVideo();
   }
   pause(): void {
@@ -153,6 +156,10 @@ export class YouTubeAdapter implements PlaybackAdapter {
   }
   setRate(_rate: number): void {
     // No-op: YouTube rates are too coarse for inaudible nudging.
+  }
+  setVolume(volume: number): void {
+    this.volume = Math.max(0, Math.min(1, volume));
+    this.player?.setVolume(this.volume * 100);
   }
   isReady(): boolean {
     return this.ready;

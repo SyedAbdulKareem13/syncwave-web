@@ -9,7 +9,7 @@ import { DEMO_TRACKS } from "./tracks";
 import { loadRoomMeta } from "./roomMeta";
 import type { ChatMessage, LobbyRoom, Member, PlaybackState, QueueItem, ReactionEvent, Role, SyncQuality, Track } from "./types";
 import type { Identity } from "./useIdentity";
-import { uid } from "./util";
+import { clamp, uid } from "./util";
 
 const START_MARGIN_MS = 700; // cushion for coordinated start (Section 4.2)
 const HEARTBEAT_MS = 4000; // host → listeners drift heartbeat (Section 4.3)
@@ -33,6 +33,7 @@ export interface RoomApi {
 
   audioReady: boolean;
   unresolved: boolean;
+  volume: number;
 
   queue: QueueItem[];
   chat: ChatMessage[];
@@ -48,6 +49,7 @@ export interface RoomApi {
   removeFromQueue: (id: string) => void;
   reorderQueue: (orderedIds: string[]) => void;
   resolveLocalFile: (file: File) => void;
+  setVolume: (v: number) => void;
   sendReaction: (emoji: string) => void;
   sendChat: (text: string) => void;
   transferHost: (userId: string) => void;
@@ -72,6 +74,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [reactions, setReactions] = useState<ReactionEvent[]>([]);
+  const [volume, setVolumeState] = useState(0.78);
 
   // ── refs (stable across renders, used inside event handlers) ───────────────
   const transportRef = useRef<Transport | null>(null);
@@ -267,6 +270,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
         if (isHostRef.current) nextRef.current();
       },
     });
+    engine.setVolume(0.78);
     const transport = createTransport(roomId, meId);
 
     clockRef.current = clock;
@@ -667,6 +671,12 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
     [safeEngine],
   );
 
+  const setVolume = useCallback((v: number) => {
+    const vol = clamp(v, 0, 1);
+    setVolumeState(vol);
+    engineRef.current?.setVolume(vol);
+  }, []);
+
   const sendReaction = useCallback(
     (emoji: string) => {
       const r: ReactionEvent = { id: uid(), userId: meId, emoji, ts: Date.now() };
@@ -727,6 +737,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
     clockOffset,
     audioReady,
     unresolved,
+    volume,
     queue,
     chat,
     reactions,
@@ -740,6 +751,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
     removeFromQueue,
     reorderQueue,
     resolveLocalFile,
+    setVolume,
     sendReaction,
     sendChat,
     transferHost,

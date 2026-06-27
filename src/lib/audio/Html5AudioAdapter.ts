@@ -97,6 +97,9 @@ export class Html5AudioAdapter implements PlaybackAdapter {
     this.el.playbackRate = rate;
     setPreservesPitch(this.el, true);
   }
+  setVolume(volume: number): void {
+    this.el.volume = Math.max(0, Math.min(1, volume));
+  }
   isReady(): boolean {
     return this.ready;
   }

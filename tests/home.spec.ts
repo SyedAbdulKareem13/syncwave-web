@@ -4,10 +4,10 @@ test.describe("SyncWave home page", () => {
   test("home renders the hero and primary actions", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByText("Press play once.")).toBeVisible();
+    await expect(page.getByText("PRESS PLAY ONCE.")).toBeVisible();
     await expect(page.getByTestId("start-room")).toBeVisible();
     await expect(page.getByTestId("join-by-code")).toBeVisible();
-    await expect(page.getByText("Live rooms")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "LIVE ROOMS" })).toBeVisible();
   });
 
   test("starting a room navigates into a room and shows the unlock overlay", async ({

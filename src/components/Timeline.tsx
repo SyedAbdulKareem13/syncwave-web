@@ -59,7 +59,7 @@ export function Timeline({
         />
       </div>
       <div className="mt-2 flex justify-between text-xs tabular text-text-muted">
-        <span>{formatMs(value)}</span>
+        <span data-testid="position-current">{formatMs(value)}</span>
         <span>{durationMs ? formatMs(durationMs) : "--:--"}</span>
       </div>
     </div>

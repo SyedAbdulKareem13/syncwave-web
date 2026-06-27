@@ -31,7 +31,12 @@ export default function HomePage() {
   };
 
   return (
-    <main className="mx-auto min-h-dvh w-full max-w-2xl px-5 pb-24 pt-8">
+    <motion.main
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="mx-auto min-h-dvh w-full max-w-2xl px-5 pb-24 pt-8"
+    >
       {/* Header */}
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -50,16 +55,18 @@ export default function HomePage() {
       </header>
 
       {editingName && identity && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/60 p-6" onClick={() => setEditingName(false)}>
+        <div role="dialog" aria-modal="true" aria-labelledby="edit-name-title" className="fixed inset-0 z-50 grid place-items-center bg-ink/60 p-6" onClick={() => setEditingName(false)}>
           <GlassCard className="w-full max-w-xs p-5" >
             <div onClick={(e) => e.stopPropagation()}>
-              <h3 className="mb-3 font-display font-semibold">Your name</h3>
+              <h3 id="edit-name-title" className="mb-3 font-display font-semibold">Your name</h3>
               <input
                 autoFocus
                 defaultValue={identity.name}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     rename((e.target as HTMLInputElement).value);
+                    setEditingName(false);
+                  } else if (e.key === "Escape") {
                     setEditingName(false);
                   }
                 }}
@@ -96,6 +103,7 @@ export default function HomePage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Room name (e.g. Friday Night In)"
+            data-testid="room-name-input"
             className="rounded-full bg-white/8 px-4 py-2.5 text-sm outline-none placeholder:text-text-muted focus:bg-white/12"
           />
           <div className="flex items-center justify-between">
@@ -106,6 +114,7 @@ export default function HomePage() {
           </div>
           <button
             onClick={startRoom}
+            data-testid="start-room"
             className="rounded-full py-3 font-semibold text-ink transition active:scale-[0.99]"
             style={{ background: "rgb(var(--accent))", boxShadow: "0 8px 30px rgb(var(--accent) / 0.4)" }}
           >
@@ -124,9 +133,10 @@ export default function HomePage() {
             onKeyDown={(e) => e.key === "Enter" && joinByCode()}
             placeholder="ABC123"
             maxLength={8}
+            data-testid="join-code-input"
             className="flex-1 rounded-full bg-white/8 px-4 py-2.5 text-sm uppercase tracking-widest outline-none placeholder:text-text-muted focus:bg-white/12"
           />
-          <button onClick={joinByCode} className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold hover:bg-white/16">
+          <button onClick={joinByCode} data-testid="join-by-code" className="rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold hover:bg-white/16">
             Join
           </button>
         </div>
@@ -157,6 +167,6 @@ export default function HomePage() {
           (see README) to sync across devices and the world.
         </p>
       )}
-    </main>
+    </motion.main>
   );
 }

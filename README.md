@@ -24,10 +24,11 @@ SyncWave synchronizes only the *playback state* (track, position, play/pause).
   HTML5 audio and micro-seek correction on YouTube.
 - **Rooms:** create / join by code, presence with live avatars, **automatic host
   election** and host transfer.
-- **The Resonance UI (Section 9):** dynamic album-art theming, frosted glass, and
-  the signature **Resonance Ring** — driven by the *synced position*, so it
-  breathes in unison on every device. That shared breath is the visual proof of
-  sync.
+- **The Resonance UI (Section 9):** dynamic album-art theming, frosted glass,
+  spring micro-interactions, and a **three.js / WebGL audio-reactive scene** plus
+  the signature **Resonance Ring** — both driven by the *synced position*, so
+  they breathe in unison on every device. That shared breath is the visual proof
+  of sync. Honors `prefers-reduced-motion`; WCAG AA focus + dialog semantics.
 - **Social:** shared queue, live chat, floating emoji reactions.
 - **Discovery:** a live public-room lobby — with **zero database** (it rides on
   Realtime presence).
@@ -89,6 +90,22 @@ watch both tabs lock to the same beat and the Resonance Ring breathe in unison.
   it, you can still paste any YouTube link — that always works.
 - **Durable persistence:** run `supabase/schema.sql` in the Supabase SQL editor
   (history, persisted queue). Not needed for the live experience.
+
+## ✅ End-to-end tests
+
+Playwright drives a real Chromium against a production build. The local-mode
+(BroadcastChannel) transport lets two pages in one browser act as two listeners,
+so the **sync engine is tested end-to-end with no Supabase**:
+
+```bash
+npm run build
+npm run test:e2e:install   # one-time: download Chromium
+npm run test:e2e
+```
+
+17 tests cover: home/navigation, presence + host election, **a host playing a
+track + a late joiner catching up in sync**, cross-client chat, shared-queue
+sync, the `/api/time` & `/api/search` routes, and accessibility semantics.
 
 ## ☁️ Deploy to Vercel
 

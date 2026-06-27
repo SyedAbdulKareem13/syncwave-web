@@ -33,7 +33,7 @@ export function SyncHealthChip({
       : `Synced · ${Math.round(skewMs)}ms`;
 
   return (
-    <div className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm">
+    <div data-testid="sync-chip" className="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm">
       <span
         className={cx("h-2.5 w-2.5 rounded-full", !isHost && quality !== "ok" && "animate-live-pulse")}
         style={{ background: color, boxShadow: `0 0 10px ${color}` }}

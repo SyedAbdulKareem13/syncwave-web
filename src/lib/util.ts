@@ -72,6 +72,36 @@ export function accentFromUri(uri: string): [number, number, number] {
   return hslToRgb(h, 70, 62);
 }
 
+export function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  return [h, s * 100, l * 100];
+}
+
+/**
+ * Guarantee an accent is bright/saturated enough that dark ink text (#0B0B12)
+ * on top of it clears WCAG AA — important because accents are sampled from
+ * arbitrary (sometimes very dark) album art. Floors lightness and saturation.
+ */
+export function ensureReadableAccent(rgb: [number, number, number]): [number, number, number] {
+  const [h, s, l] = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+  return hslToRgb(h, Math.max(s, 55), Math.max(l, 62));
+}
+
 export function hslToRgb(h: number, s: number, l: number): [number, number, number] {
   s /= 100;
   l /= 100;

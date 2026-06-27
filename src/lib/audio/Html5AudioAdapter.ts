@@ -19,7 +19,11 @@ export class Html5AudioAdapter implements PlaybackAdapter {
   constructor() {
     this.el = new Audio();
     this.el.preload = "auto";
-    this.el.crossOrigin = "anonymous";
+    // NOTE: deliberately NOT setting crossOrigin. Cross-origin audio (the demo
+    // catalog, arbitrary mp3s) often lacks CORS headers; requesting it in CORS
+    // mode would block the media load entirely. We don't need Web Audio
+    // analysis here (the Resonance Ring is driven by the synced position), so
+    // plain no-cors media playback is exactly right.
     // Keep pitch natural while rate-nudging.
     setPreservesPitch(this.el, true);
     this.el.addEventListener("ended", () => this.endedCb?.());
@@ -56,13 +60,17 @@ export class Html5AudioAdapter implements PlaybackAdapter {
       };
       const cleanup = () => {
         this.el.removeEventListener("canplay", onReady);
+        this.el.removeEventListener("loadeddata", onReady);
         this.el.removeEventListener("error", onError);
         clearTimeout(timer);
       };
-      // Resolve as soon as it's playable; don't block forever on slow networks.
+      // Resolve once the element is seekable/playable; don't block forever on
+      // slow networks. canplay (readyState>=3) or loadeddata (>=2) both mean
+      // seekTo will land correctly.
       this.el.addEventListener("canplay", onReady, { once: true });
+      this.el.addEventListener("loadeddata", onReady, { once: true });
       this.el.addEventListener("error", onError, { once: true });
-      const timer = setTimeout(onReady, 4000); // proceed; buffering continues
+      const timer = setTimeout(onReady, 8000); // last-resort; buffering continues
     });
   }
 

@@ -94,6 +94,7 @@ function Row({
       </div>
       <button
         onClick={() => onSelect("queue")}
+        data-testid="picker-queue"
         className="rounded-full bg-white/8 px-3 py-1.5 text-xs font-medium hover:bg-white/14"
       >
         Queue
@@ -101,6 +102,7 @@ function Row({
       {canPlayNow && (
         <button
           onClick={() => onSelect("play")}
+          data-testid="picker-play"
           className="rounded-full px-3 py-1.5 text-xs font-semibold text-ink"
           style={{ background: "rgb(var(--accent))" }}
         >
@@ -166,6 +168,7 @@ function YouTubeTab({ canPlayNow, onSelect }: { canPlayNow: boolean; onSelect: (
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && run()}
           placeholder="Paste a YouTube link or search…"
+          aria-label="Paste a YouTube link or search for a track"
           className="flex-1 rounded-full bg-white/8 px-4 py-2 text-sm outline-none placeholder:text-text-muted focus:bg-white/12"
         />
         <button onClick={run} className="rounded-full px-4 py-2 text-sm font-semibold text-ink" style={{ background: "rgb(var(--accent))" }}>

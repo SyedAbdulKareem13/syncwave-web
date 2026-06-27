@@ -74,11 +74,14 @@ export class SupabaseTransport extends BaseTransport {
   }
 
   async trackPresence(meta: PresenceMeta): Promise<void> {
-    await this.channel?.track(meta);
+    if (!this.channel || !this.joined) return; // not connected yet / already left
+    await this.channel.track(meta);
   }
 
   async updatePresence(meta: PresenceMeta): Promise<void> {
-    await this.channel?.track(meta);
+    // Called periodically (e.g. on clock updates); may fire after leave().
+    if (!this.channel || !this.joined) return;
+    await this.channel.track(meta);
   }
 
   private emitPresence(): void {

@@ -86,6 +86,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const joinedAtRef = useRef<number>(0);
   const metaRef = useRef(loadRoomMeta(roomId));
+  const promoteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const meId = me?.userId ?? "";
 
@@ -198,9 +199,12 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
 
   // ── host election (presence-derived, deterministic) ────────────────────────
   const electHost = useCallback((list: Member[]): string => {
-    const explicit = list.find((m) => m.role === "host");
-    if (explicit) return explicit.userId;
-    const sorted = [...list].sort((a, b) => a.joinedAt - b.joinedAt || (a.userId < b.userId ? -1 : 1));
+    // Deterministic across all clients: prefer the lowest-joinedAt among explicit
+    // hosts (so a manual host transfer sticks and a transient dual-host race
+    // resolves identically everywhere); otherwise the longest-present member.
+    const hosts = list.filter((m) => m.role === "host");
+    const pool = hosts.length > 0 ? hosts : list;
+    const sorted = [...pool].sort((a, b) => a.joinedAt - b.joinedAt || (a.userId < b.userId ? -1 : 1));
     return sorted[0]?.userId ?? "";
   }, []);
 
@@ -400,8 +404,25 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
 
       const elected = electHost(list);
       setHostId(elected);
-      if (elected === meId && !isHostRef.current) void becomeHost();
-      else if (elected !== meId && isHostRef.current) void demote();
+      const someoneElseHosts = list.some((m) => m.role === "host" && m.userId !== meId);
+      if (elected === meId && !isHostRef.current && !someoneElseHosts) {
+        // Defer self-promotion so a freshly-joined client can first discover an
+        // existing host (presence is learned with a small lag). Re-check on fire.
+        if (!promoteTimerRef.current) {
+          promoteTimerRef.current = setTimeout(() => {
+            promoteTimerRef.current = null;
+            const cur = membersRef.current;
+            const otherHost = cur.some((m) => m.role === "host" && m.userId !== meId);
+            if (!otherHost && !isHostRef.current && electHost(cur) === meId) void becomeHost();
+          }, 1200);
+        }
+      } else {
+        if (promoteTimerRef.current) {
+          clearTimeout(promoteTimerRef.current);
+          promoteTimerRef.current = null;
+        }
+        if (elected !== meId && isHostRef.current && someoneElseHosts) void demote();
+      }
       updateLobby();
     });
     offs.push(offPresence);
@@ -432,6 +453,7 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
     return () => {
       disposed = true;
       stopHeartbeat();
+      if (promoteTimerRef.current) clearTimeout(promoteTimerRef.current);
       for (const off of offs) off();
       engine.destroy();
       clock.stop();
@@ -522,8 +544,9 @@ export function useRoom(roomId: string, me: Identity | null): RoomApi {
       transport.emit("playback:start", { track: cur.track, positionMs: pos, startAtServerTs: startAt, by: meId });
       syncMirrors(state);
     }
+    startHeartbeat(); // keep drift heartbeats running after resume (no-op if already running)
     updateLobby();
-  }, [meId, safeEngine, syncMirrors, updateLobby]);
+  }, [meId, safeEngine, syncMirrors, updateLobby, startHeartbeat]);
 
   const seek = useCallback(
     (ms: number) => {

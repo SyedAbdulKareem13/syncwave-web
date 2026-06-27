@@ -43,6 +43,7 @@ export function PresenceBar({
                 isRoomHost && "ring-1 ring-accent",
               )}
               title={m.name}
+              data-testid="member"
             >
               <span className="grid h-7 w-7 place-items-center rounded-full bg-white/10 text-base">{m.avatar}</span>
               <span className="max-w-[90px] truncate text-xs font-medium text-text-primary">

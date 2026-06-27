@@ -100,6 +100,19 @@ input[type="range"].timeline:disabled::-webkit-slider-thumb {
   background: #9a9aae;
   box-shadow: none;
 }
+input[type="range"].timeline:focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* Global keyboard focus ring — covers every button/link/tab without touching
+   each component (WCAG 2.4.7). Pointer clicks stay clean via :focus-visible. */
+:where(button, a, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--accent));
+  outline-offset: 2px;
+  border-radius: 12px;
+}
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;

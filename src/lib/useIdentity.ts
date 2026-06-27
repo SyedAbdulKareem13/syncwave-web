@@ -15,6 +15,18 @@ export function useIdentity(): { identity: Identity | null; rename: (name: strin
   const [identity, setIdentity] = useState<Identity | null>(null);
 
   useEffect(() => {
+    // Test/preview seam: ?uid=&name= give this tab an ephemeral identity (not
+    // persisted), so two tabs of one browser can act as two distinct listeners.
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const uidParam = params.get("uid");
+      if (uidParam) {
+        setIdentity({ userId: uidParam, name: params.get("name") || randomName(uidParam), avatar: pickAvatar(uidParam) });
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
     try {
       const raw = localStorage.getItem(KEY);
       if (raw) {

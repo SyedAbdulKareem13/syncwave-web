@@ -1,5 +1,5 @@
 import type { Track } from "./types";
-import { accentFromUri } from "./util";
+import { accentFromUri, ensureReadableAccent } from "./util";
 
 export type AccentPair = { accent: [number, number, number]; accent2: [number, number, number] };
 
@@ -11,6 +11,12 @@ export type AccentPair = { accent: [number, number, number]; accent2: [number, n
  *   3. Deterministic hash of the uri, so theming is stable & never ugly.
  */
 export async function resolveAccents(track: Track | null): Promise<AccentPair> {
+  const raw = await resolveAccentsRaw(track);
+  // Floor luminance so dark-ink text on accent backgrounds always passes AA.
+  return { accent: ensureReadableAccent(raw.accent), accent2: ensureReadableAccent(raw.accent2) };
+}
+
+async function resolveAccentsRaw(track: Track | null): Promise<AccentPair> {
   if (!track) return { accent: [124, 92, 255], accent2: [40, 200, 220] };
   if (track.accent && track.accent2) return { accent: track.accent, accent2: track.accent2 };
 

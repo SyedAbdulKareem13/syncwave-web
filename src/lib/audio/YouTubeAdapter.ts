@@ -59,6 +59,7 @@ export class YouTubeAdapter implements PlaybackAdapter {
   private ready = false;
   private endedCb: (() => void) | null = null;
   private currentId: string | null = null;
+  private cueResolve: (() => void) | null = null;
 
   private ensureContainer(): HTMLDivElement {
     if (this.container) return this.container;
@@ -96,7 +97,15 @@ export class YouTubeAdapter implements PlaybackAdapter {
               resolve();
             },
             onStateChange: (e: { data: number }) => {
-              if (window.YT && e.data === window.YT.PlayerState.ENDED) this.endedCb?.();
+              if (!window.YT) return;
+              if (e.data === window.YT.PlayerState.ENDED) this.endedCb?.();
+              // Resolve a pending cue once the new video is actually ready.
+              if (
+                (e.data === window.YT.PlayerState.CUED || e.data === window.YT.PlayerState.PLAYING) &&
+                this.cueResolve
+              ) {
+                this.cueResolve();
+              }
             },
           },
         });
@@ -104,9 +113,25 @@ export class YouTubeAdapter implements PlaybackAdapter {
       return;
     }
 
-    // Reuse the existing player for subsequent tracks.
-    this.player.cueVideoById({ videoId });
-    this.currentId = videoId;
+    // Reuse the player for subsequent tracks, but DON'T report ready until the
+    // new video is actually cued/buffered (CUED or PLAYING state), with a
+    // timeout fallback so we never hang. This prevents seek/play firing on a
+    // not-yet-loaded video (a real sync bug on track changes).
+    if (this.currentId === videoId && this.ready) return; // already cued
+    this.ready = false;
+    await new Promise<void>((resolve) => {
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        this.cueResolve = null;
+        resolve();
+      };
+      this.cueResolve = finish;
+      this.player!.cueVideoById({ videoId });
+      this.currentId = videoId;
+      setTimeout(finish, 4000);
+    });
     this.ready = true;
   }
 

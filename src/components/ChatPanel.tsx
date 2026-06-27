@@ -23,7 +23,7 @@ export function ChatPanel({ chat, meId, onSend }: { chat: ChatMessage[]; meId: s
         {chat.map((m) => {
           const mine = m.userId === meId;
           return (
-            <div key={m.id} className={cx("flex gap-2", mine && "flex-row-reverse")}>
+            <div key={m.id} data-testid="chat-message" className={cx("flex gap-2", mine && "flex-row-reverse")}>
               <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/10 text-sm">
                 {m.avatar}
               </span>

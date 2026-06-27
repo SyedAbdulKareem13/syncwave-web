@@ -19,6 +19,11 @@ import { useIdentity } from "@/lib/useIdentity";
 import { useRoom } from "@/lib/useRoom";
 import { resolveAccents, type AccentPair } from "@/lib/colors";
 import { applyAccents } from "@/lib/accents";
+import dynamic from "next/dynamic";
+
+const ResonanceScene = dynamic(() => import("@/components/ResonanceScene").then((m) => m.ResonanceScene), {
+  ssr: false,
+});
 
 export default function RoomPage({ params }: { params: { id: string } }) {
   const roomId = decodeURIComponent(params.id).toUpperCase();
@@ -69,7 +74,12 @@ export default function RoomPage({ params }: { params: { id: string } }) {
   const showWaiting = !room.track && !room.isHost;
 
   return (
-    <main className="relative mx-auto min-h-dvh w-full max-w-2xl px-5 pb-28 pt-5">
+    <motion.main
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      className="relative mx-auto min-h-dvh w-full max-w-2xl px-5 pb-28 pt-5"
+    >
       {/* Top bar */}
       <header className="flex items-center justify-between gap-3">
         <Link href="/" className="glass grid h-9 w-9 place-items-center rounded-full text-text-muted hover:text-text-primary" aria-label="Back home">
@@ -77,7 +87,7 @@ export default function RoomPage({ params }: { params: { id: string } }) {
         </Link>
         <div className="min-w-0 flex-1 text-center">
           <h1 className="truncate font-display text-base font-semibold">{room.roomName}</h1>
-          <button onClick={share} className="text-xs tracking-widest text-text-muted hover:text-text-primary">
+          <button onClick={share} data-testid="room-code" className="text-xs tracking-widest text-text-muted hover:text-text-primary">
             {copied ? "Link copied ✓" : `CODE ${roomId} · share`}
           </button>
         </div>
@@ -99,14 +109,25 @@ export default function RoomPage({ params }: { params: { id: string } }) {
       <section className="relative mt-6 flex flex-col items-center">
         <ReactionLayer reactions={room.reactions} />
 
-        <ResonanceRing positionMs={room.positionMs} isPlaying={room.isPlaying} accent={accents.accent} accent2={accents.accent2} size={ringSize}>
-          <AlbumArt track={room.track} accent={accents.accent} accent2={accents.accent2} />
-        </ResonanceRing>
+        {/* WebGL audio-reactive backdrop, behind the ring, driven by the synced position */}
+        <div
+          className="pointer-events-none absolute left-1/2 top-[110px] h-[460px] w-[460px] max-w-[94vw] -translate-x-1/2"
+          style={{ zIndex: -1 }}
+        >
+          <ResonanceScene positionMs={room.positionMs} isPlaying={room.isPlaying} accent={accents.accent} accent2={accents.accent2} className="h-full w-full" />
+        </div>
+
+        <div className="relative z-10">
+          <ResonanceRing positionMs={room.positionMs} isPlaying={room.isPlaying} accent={accents.accent} accent2={accents.accent2} size={ringSize}>
+            <AlbumArt track={room.track} accent={accents.accent} accent2={accents.accent2} />
+          </ResonanceRing>
+        </div>
 
         <div className="mt-7 text-center">
           <AnimatePresence mode="wait">
             <motion.h2
               key={room.track?.uri ?? "none"}
+              data-testid="track-title"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
@@ -143,6 +164,7 @@ export default function RoomPage({ params }: { params: { id: string } }) {
         {showStartCta && (
           <button
             onClick={() => setPickerOpen(true)}
+            data-testid="start-music"
             className="mt-6 rounded-full px-6 py-3 font-semibold text-ink"
             style={{ background: "rgb(var(--accent))", boxShadow: "0 8px 30px rgb(var(--accent) / 0.45)" }}
           >
@@ -184,6 +206,6 @@ export default function RoomPage({ params }: { params: { id: string } }) {
       </AnimatePresence>
 
       {room.ready && !room.audioReady && <JoinOverlay roomName={room.roomName} onJoin={room.unlock} />}
-    </main>
+    </motion.main>
   );
 }

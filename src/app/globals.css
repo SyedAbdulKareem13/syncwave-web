@@ -211,6 +211,21 @@ body {
   .room-grid { grid-template-columns: 1fr; }
 }
 
+/* ---------- Responsive / mobile (from handoff v2) ---------- */
+@media (max-width: 768px) {
+  header { padding-left: 16px !important; padding-right: 16px !important; gap: 10px !important; }
+  section { padding-left: 16px !important; padding-right: 16px !important; }
+  .navlink, .earth-badge { display: none !important; }
+  .room-grid { grid-template-columns: 1fr !important; padding: 16px !important; gap: 16px !important; }
+  .vinyl { display: none !important; }
+}
+@media (max-width: 600px) {
+  .herostage { transform: scale(0.66); margin: -75px; }
+}
+@media (max-width: 380px) {
+  .herostage { transform: scale(0.56); margin: -97px; }
+}
+
 /* ── chromatic-aberration headings ────────────────────────────────────────── */
 .chroma {
   text-shadow: 2px 0 var(--pink), -2px 0 var(--cyan);

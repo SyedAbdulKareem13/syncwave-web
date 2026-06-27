@@ -1,0 +1,28 @@
+{
+  "appId": "app.syncwave.mobile",
+  "appName": "SyncWave",
+  "webDir": "mobile/www",
+  "backgroundColor": "#08070F",
+  "loggingBehavior": "none",
+  "server": {
+    "url": "https://syncwave-web-kappa.vercel.app",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "backgroundColor": "#08070F",
+    "allowMixedContent": false,
+    "webContentsDebuggingEnabled": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1800,
+      "launchAutoHide": true,
+      "backgroundColor": "#08070F",
+      "androidScaleType": "CENTER_INSIDE",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
+  }
+}

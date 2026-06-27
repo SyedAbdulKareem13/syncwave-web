@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SyncWave</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #08070f; color: #f4f1ff; font-family: system-ui, sans-serif; }
+      .wrap { height: 100%; display: grid; place-items: center; text-align: center; }
+      .mark { width: 84px; height: 84px; animation: sway 4s steps(8) infinite; }
+      .t { margin-top: 14px; font-size: 13px; letter-spacing: 0.22em; opacity: 0.85; }
+      .s { margin-top: 6px; font-size: 12px; letter-spacing: 0.06em; opacity: 0.5; }
+      @keyframes sway { 0%,100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+    </style>
+  </head>
+  <body>
+    <!-- Fallback shell shown only if the live app can't be reached (offline). -->
+    <div class="wrap">
+      <div>
+        <svg class="mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="#1FE0FF" stroke-width="3" fill="none">
+            <line x1="50" y1="50" x2="50" y2="8" /><line x1="50" y1="50" x2="82" y2="22" /><line x1="50" y1="50" x2="92" y2="50" /><line x1="50" y1="50" x2="82" y2="78" /><line x1="50" y1="50" x2="50" y2="92" /><line x1="50" y1="50" x2="18" y2="78" /><line x1="50" y1="50" x2="8" y2="50" /><line x1="50" y1="50" x2="18" y2="22" />
+            <polygon points="68,50 63,63 50,68 37,63 32,50 37,37 50,32 63,37" /><polygon points="86,50 75,75 50,86 25,75 14,50 25,25 50,14 75,25" />
+          </g>
+          <circle cx="50" cy="50" r="7" fill="#FF2A6D" />
+        </svg>
+        <div class="t">SYNCWAVE</div>
+        <div class="s">Connecting to the multiverse…</div>
+      </div>
+    </div>
+  </body>
+</html>

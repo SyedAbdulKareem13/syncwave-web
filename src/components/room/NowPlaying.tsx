@@ -45,7 +45,7 @@ export function NowPlaying({ room, onAddClick }: { room: RoomApi; onAddClick: ()
             <div style={{ position: "absolute", inset: 0, opacity: 0.25, backgroundImage: "radial-gradient(#08070F 1.2px,transparent 1.5px)", backgroundSize: "7px 7px" }} />
             <div style={{ position: "absolute", left: 10, top: 10, fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", color: "#08070F", background: "#FFE600", padding: "2px 6px", border: "1.5px solid #000" }}>{trackTag(t)}</div>
           </div>
-          <div style={{ position: "absolute", right: -44, top: "50%", transform: "translateY(-50%)", width: 150, height: 150, borderRadius: "50%", background: "repeating-radial-gradient(#0c0a14 0 3px,#181225 3px 5px)", border: "3px solid #000", boxShadow: "4px 4px 0 rgba(0,0,0,.5)", zIndex: -1, animation: "spin12 3.2s steps(16) infinite", animationPlayState: room.isPlaying ? "running" : "paused" }}>
+          <div className="vinyl" style={{ position: "absolute", right: -44, top: "50%", transform: "translateY(-50%)", width: 150, height: 150, borderRadius: "50%", background: "repeating-radial-gradient(#0c0a14 0 3px,#181225 3px 5px)", border: "3px solid #000", boxShadow: "4px 4px 0 rgba(0,0,0,.5)", zIndex: -1, animation: "spin12 3.2s steps(16) infinite", animationPlayState: room.isPlaying ? "running" : "paused" }}>
             <div style={{ position: "absolute", inset: 0, margin: "auto", width: 46, height: 46, borderRadius: "50%", background: vinylLabel(t), border: "2px solid #000", display: "grid", placeItems: "center" }}>
               <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#08070F" }} />
             </div>

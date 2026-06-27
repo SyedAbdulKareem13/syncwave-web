@@ -33,6 +33,10 @@ yarn-error.log*
 /blob-report
 /playwright/.cache
 
+# capacitor native projects (generated in CI by `npx cap add`)
+/android
+/ios
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts.bak

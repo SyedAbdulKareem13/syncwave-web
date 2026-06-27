@@ -58,7 +58,7 @@ export default function HomePage() {
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <WebLogo />
             <div style={{ fontFamily: "var(--font-display)", fontSize: 22, letterSpacing: ".5px", color: "#F4F1FF" }} className="chroma">SYNCWAVE</div>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: ".12em", color: "#08070F", background: "#1FE0FF", padding: "3px 7px", border: "2px solid #000", transform: "rotate(-3deg)" }}>EARTH-1610</span>
+            <span className="earth-badge" style={{ fontFamily: "var(--font-mono)", fontSize: 9, fontWeight: 700, letterSpacing: ".12em", color: "#08070F", background: "#1FE0FF", padding: "3px 7px", border: "2px solid #000", transform: "rotate(-3deg)" }}>EARTH-1610</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
             <a href="#how" className="navlink">HOW IT WORKS</a>
@@ -75,10 +75,10 @@ export default function HomePage() {
 
         {/* HERO */}
         <section style={{ maxWidth: 1240, margin: "0 auto", padding: "54px 30px 30px", display: "flex", flexWrap: "wrap", alignItems: "center", gap: 40 }}>
-          <div style={{ flex: "1 1 460px", minWidth: 300, animation: "enterUp .6s cubic-bezier(.16,1,.3,1) both" }}>
+          <div style={{ flex: "1 1 460px", minWidth: 0, animation: "enterUp .6s cubic-bezier(.16,1,.3,1) both" }}>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 8, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: ".14em", color: "#1FE0FF", border: "2px solid #1FE0FF", padding: "5px 10px", marginBottom: 22, transform: "rotate(-1deg)" }}>// REAL-TIME AUDIO SYNC ENGINE</div>
-            <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 0.96, fontSize: "clamp(44px,6vw,82px)", letterSpacing: "-.5px", color: "#F4F1FF" }} className="chroma-lg">PRESS PLAY ONCE.</h1>
-            <h1 style={{ margin: "6px 0 0", fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 0.96, fontSize: "clamp(44px,6vw,82px)", letterSpacing: "-.5px", color: "#F4F1FF" }}>
+            <h1 style={{ margin: 0, fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 0.96, fontSize: "clamp(31px,7.5vw,82px)", letterSpacing: "-.5px", color: "#F4F1FF" }} className="chroma-lg">PRESS PLAY ONCE.</h1>
+            <h1 style={{ margin: "6px 0 0", fontFamily: "var(--font-display)", fontWeight: 400, lineHeight: 0.96, fontSize: "clamp(31px,7.5vw,82px)", letterSpacing: "-.5px", color: "#F4F1FF" }}>
               EVERYONE&apos;S ON<br />THE <span data-testid="glitch-beat" style={{ color: "#1FE0FF", WebkitTextStroke: "2px #000", textShadow: "4px 4px 0 #FF2A6D", display: "inline-block", animation: "glitchTxt 4.5s steps(2) infinite" }}>BEAT.</span>
             </h1>
             <div style={{ margin: "26px 0 30px", maxWidth: 520, background: "#FFE600", color: "#08070F", border: "3px solid #000", boxShadow: "6px 6px 0 #000", padding: "14px 16px", transform: "rotate(-.6deg)" }}>
@@ -95,8 +95,10 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-          <div style={{ flex: "1 1 380px", minWidth: 320, display: "flex", justifyContent: "center", animation: "enterUp .7s cubic-bezier(.16,1,.3,1) .12s both" }}>
-            <SpiderWebHero />
+          <div style={{ flex: "1 1 380px", minWidth: 0, display: "flex", justifyContent: "center", animation: "enterUp .7s cubic-bezier(.16,1,.3,1) .12s both" }}>
+            <div className="herostage">
+              <SpiderWebHero />
+            </div>
           </div>
         </section>
 
@@ -105,7 +107,7 @@ export default function HomePage() {
         {/* HOW IT WORKS */}
         <section id="how" style={{ maxWidth: 1180, margin: "0 auto", padding: "30px 30px 10px" }}>
           <SectionHeading title="HOW IT WORKS" dash="#FF2A6D" />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(280px,100%),1fr))", gap: 20 }}>
             {[
               { n: "01", sh: "rgba(255,42,109,.55)", num: "rgba(255,42,109,.16)", bg: "#FF2A6D", tc: "#fff", title: "START A ROOM", body: "Spin up a room in one click. Make it public for the multiverse, or keep it private with a code.", icon: <><circle cx="12" cy="12" r="9" /><path d="M12 3v18M3 12h18M6 6l12 12M18 6L6 18" /></> },
               { n: "02", sh: "rgba(31,224,255,.5)", num: "rgba(31,224,255,.16)", bg: "#1FE0FF", tc: "#08070F", title: "DROP THE NEEDLE", body: "Queue up tracks. Everyone loads their own copy — no re-uploading, no buffering chaos.", icon: <circle cx="12" cy="12" r="3.4" /> },
@@ -128,7 +130,7 @@ export default function HomePage() {
         </section>
 
         {/* START / JOIN */}
-        <section id="start" style={{ maxWidth: 1180, margin: "0 auto", padding: "46px 30px 20px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 24 }}>
+        <section id="start" style={{ maxWidth: 1180, margin: "0 auto", padding: "46px 30px 20px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(320px,100%),1fr))", gap: 24 }}>
           {/* START */}
           <div style={{ position: "relative", background: "#14101F", border: "3px solid #000", boxShadow: "9px 9px 0 #FF2A6D", padding: "26px 24px" }}>
             <div style={{ position: "absolute", left: 18, top: -16, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: ".14em", color: "#08070F", background: "#FF2A6D", padding: "5px 10px", border: "2.5px solid #000", transform: "rotate(-2deg)" }}>01 / START A ROOM</div>
@@ -152,7 +154,7 @@ export default function HomePage() {
           <div style={{ position: "relative", background: "#14101F", border: "3px solid #000", boxShadow: "9px 9px 0 #1FE0FF", padding: "26px 24px" }}>
             <div style={{ position: "absolute", left: 18, top: -16, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: ".14em", color: "#08070F", background: "#1FE0FF", padding: "5px 10px", border: "2.5px solid #000", transform: "rotate(2deg)" }}>02 / JOIN WITH A CODE</div>
             <label style={{ display: "block", fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: ".12em", color: "#9A93B5", margin: "14px 0 7px" }}>6-DIGIT ROOM CODE</label>
-            <input ref={joinRef} value={code} onChange={(e) => setCode(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6))} onKeyDown={(e) => e.key === "Enter" && joinByCode()} placeholder="GWEN65" maxLength={6} data-testid="join-code-input" className="comic-input cyan" style={{ color: "#1FE0FF", fontFamily: "var(--font-display)", fontSize: 34, letterSpacing: ".42em", textAlign: "center", padding: "16px 0 16px 16px", textTransform: "uppercase" }} />
+            <input ref={joinRef} value={code} onChange={(e) => setCode(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6))} onKeyDown={(e) => e.key === "Enter" && joinByCode()} placeholder="GWEN65" maxLength={6} data-testid="join-code-input" className="comic-input cyan" style={{ color: "#1FE0FF", fontFamily: "var(--font-display)", fontSize: "clamp(22px,6.5vw,34px)", letterSpacing: ".3em", textAlign: "center", padding: "16px 0 16px 16px", textTransform: "uppercase" }} />
             <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 10 }}>
               {["#1FE0FF", "#FF2A6D", "#C6FF00"].map((c, i) => (
                 <span key={c} style={{ width: 8, height: 8, background: c, borderRadius: "50%", animation: `eqBar 1s ease-in-out ${i * 0.3}s infinite` }} />
@@ -178,7 +180,7 @@ export default function HomePage() {
               No public rooms right now. Spin one up above — it&apos;ll swing in here for everyone.
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(330px,1fr))", gap: 20 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(min(330px,100%),1fr))", gap: 20 }}>
               {rooms.map((r) => (
                 <RoomCard key={r.roomId} room={r} onJoin={() => router.push(`/room/${r.roomId}`)} />
               ))}
